@@ -1,0 +1,22 @@
+name: checks
+
+on:
+  pull_request:
+  push:
+
+defaults:
+  run:
+    working-directory: w02-prompt-lab/w02-prompt-lab
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen --all-groups
+      - run: uv run ruff check src/promptlab/usage.py src/promptlab/day1.py
+      - run: uv run mypy src/promptlab/usage.py src/promptlab/day1.py
+      - run: uv run pytest tests/test_usage_contract.py
