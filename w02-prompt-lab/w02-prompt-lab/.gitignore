@@ -6,4 +6,5 @@ __pycache__/
 .ruff_cache/
 *.py[cod]
 runs/
-
+Master.md
+notes.md
