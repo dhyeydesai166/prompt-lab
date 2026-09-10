@@ -1,8 +1,3 @@
-"""Day 1 usage-recording contract.
-
-Implement this module by following assignments/W02_Day1_Assignment_LOCAL.md.
-"""
-
 from __future__ import annotations
 
 from datetime import datetime
