@@ -17,6 +17,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --frozen --all-groups
-      - run: uv run ruff check src/promptlab/usage.py src/promptlab/day1.py
-      - run: uv run mypy src/promptlab/usage.py src/promptlab/day1.py
-      - run: uv run pytest tests/test_usage_contract.py
+      - run: uv run ruff check src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py
+      - run: uv run mypy src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py
+      - run: uv run pytest tests/test_usage_contract.py tests/test_adapter_contract.py
