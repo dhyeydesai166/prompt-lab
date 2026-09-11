@@ -77,6 +77,7 @@ class OllamaAdapter:
                     "prompt": request.user_content,
                     "system": request.system,
                     "stream": False,
+                    "think": False,
                     "options": {
                         "temperature": request.temperature,
                         "num_predict": request.max_output_tokens,
