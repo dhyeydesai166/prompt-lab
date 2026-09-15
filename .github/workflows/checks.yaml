@@ -17,6 +17,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --frozen --all-groups
-      - run: uv run ruff check src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py src/promptlab/schemas.py src/promptlab/structured.py src/promptlab/day3.py tests/test_structured_contract.py
-      - run: uv run mypy src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py src/promptlab/schemas.py src/promptlab/structured.py src/promptlab/day3.py tests/test_structured_contract.py
-      - run: uv run pytest tests/test_usage_contract.py tests/test_adapter_contract.py tests/test_structured_contract.py
+      - run: uv run ruff check src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py src/promptlab/schemas.py src/promptlab/structured.py src/promptlab/day3.py src/promptlab/prompts.py src/promptlab/scoring.py src/promptlab/day4.py tests/test_structured_contract.py tests/test_prompt_registry_contract.py
+      - run: uv run mypy src/promptlab/usage.py src/promptlab/day1.py src/promptlab/errors.py src/promptlab/adapters src/promptlab/day2.py src/promptlab/schemas.py src/promptlab/structured.py src/promptlab/day3.py src/promptlab/prompts.py src/promptlab/scoring.py src/promptlab/day4.py tests/test_structured_contract.py tests/test_prompt_registry_contract.py
+      - run: uv run pytest tests/test_usage_contract.py tests/test_adapter_contract.py tests/test_structured_contract.py tests/test_prompt_registry_contract.py
