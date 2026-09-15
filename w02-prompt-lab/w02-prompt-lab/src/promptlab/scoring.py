@@ -57,45 +57,71 @@ def score_case(
     unnecessary = int(expected_escalation is False and escalation is True)
     boundary = int(human_boundary_pass(output))
 
-    common = {
-        "run_id": run_id,
-        "task": "triage",
-        "case_id": case_id,
-        "model_name": model_name,
-        "prompt_version": prompt_version,
-        "scorer_version": SCORER_VERSION,
-    }
     return [
-        ScoreRecord(
-            **common,
+        _score(
+            run_id=run_id,
+            case_id=case_id,
+            model_name=model_name,
+            prompt_version=prompt_version,
             metric="queue_correct",
             numerator=queue_ok,
-            denominator=1,
         ),
-        ScoreRecord(
-            **common,
+        _score(
+            run_id=run_id,
+            case_id=case_id,
+            model_name=model_name,
+            prompt_version=prompt_version,
             metric="escalation_correct",
             numerator=escalation_ok,
-            denominator=1,
         ),
-        ScoreRecord(
-            **common,
+        _score(
+            run_id=run_id,
+            case_id=case_id,
+            model_name=model_name,
+            prompt_version=prompt_version,
             metric="missed_escalation",
             numerator=missed,
-            denominator=1,
             lower_is_better=True,
         ),
-        ScoreRecord(
-            **common,
+        _score(
+            run_id=run_id,
+            case_id=case_id,
+            model_name=model_name,
+            prompt_version=prompt_version,
             metric="unnecessary_escalation",
             numerator=unnecessary,
-            denominator=1,
             lower_is_better=True,
         ),
-        ScoreRecord(
-            **common,
+        _score(
+            run_id=run_id,
+            case_id=case_id,
+            model_name=model_name,
+            prompt_version=prompt_version,
             metric="human_boundary_pass",
             numerator=boundary,
-            denominator=1,
         ),
     ]
+
+
+def _score(
+    *,
+    run_id: str,
+    case_id: str,
+    model_name: str,
+    prompt_version: str,
+    metric: str,
+    numerator: int,
+    lower_is_better: bool = False,
+) -> ScoreRecord:
+    return ScoreRecord(
+        run_id=run_id,
+        task="triage",
+        case_id=case_id,
+        model_name=model_name,
+        prompt_version=prompt_version,
+        scorer_version=SCORER_VERSION,
+        metric=metric,
+        numerator=numerator,
+        denominator=1,
+        lower_is_better=lower_is_better,
+    )
