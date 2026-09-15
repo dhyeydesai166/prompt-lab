@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import hashlib
 import re
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 from pydantic import BaseModel, ConfigDict
 
@@ -108,4 +108,21 @@ def render_user(
     - untrusted text is supplied through ``document_text``
     - literal JSON braces in prompt examples must remain literal
     """
-    raise NotImplementedError
+
+    required = _placeholders(template.user_template)
+    provided = set(variables) | {"document_text"}
+    missing = sorted(required - provided)
+    if missing:
+        raise MissingPromptVariableError(missing)
+
+    sanitized = untrusted.replace(
+        CUSTOMER_MARKER_CLOSE, "&lt;/customer_message&gt;"
+    ).replace(DOCUMENT_MARKER_CLOSE, "&lt;/document&gt;")
+
+    values = dict(variables)
+    values["document_text"] = sanitized
+
+    rendered = template.user_template
+    for name in required:
+        rendered = rendered.replace("{" + name + "}", values[name])
+    return rendered
