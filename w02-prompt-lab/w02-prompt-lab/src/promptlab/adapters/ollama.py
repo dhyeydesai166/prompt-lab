@@ -16,6 +16,7 @@ from promptlab.errors import (
     TruncatedResponseError,
     UnknownModelError,
 )
+from promptlab.timings import ollama_durations_ms
 from promptlab.usage import CallRecord, append_record, compute_cost
 
 MAX_ATTEMPTS = 3
@@ -33,13 +34,26 @@ class OllamaAdapter:
             raise UnknownModelError(model_id)
         self.model_id = model_id
         self._base_url = settings.ollama_base_url
+        self.last_attempt_timings: dict[str, float | None] | None = None
+        self.attempt_timings: list[dict[str, float | None]] = []
 
     def complete(self, request: CompletionRequest, run_id: str) -> CompletionResult:
         records: list[CallRecord] = []
+        self.attempt_timings = []
         for attempt in range(1, MAX_ATTEMPTS + 1):
             record, outcome = self._one_attempt(request, run_id, attempt)
             append_record(record, run_id)
             records.append(record)
+            self.attempt_timings.append(
+                self.last_attempt_timings
+                if self.last_attempt_timings is not None
+                else {
+                    "load_duration_ms": None,
+                    "prompt_eval_duration_ms": None,
+                    "eval_duration_ms": None,
+                    "total_duration_ms": None,
+                }
+            )
 
             if outcome == "success":
                 return CompletionResult(
@@ -107,6 +121,7 @@ class OllamaAdapter:
         output_tokens = _as_int(payload, "eval_count") if payload else 0
         stop_reason = payload.get("done_reason") if payload else None
         text = _response_text(payload) if payload else None
+        self.last_attempt_timings = ollama_durations_ms(payload)
 
         record = CallRecord(
             record_id=str(uuid.uuid4()),

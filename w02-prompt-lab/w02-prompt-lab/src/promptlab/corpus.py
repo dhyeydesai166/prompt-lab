@@ -68,6 +68,11 @@ class GoldLabel(BaseModel):
     expected_queue: str | None = None
     expected_escalation: bool | None = None
 
+    # Version-selection groups (code decides; model does not)
+    version_group: str | None = None
+    as_of: str | None = None
+    expected_current_case_id: str | None = None
+
     @model_validator(mode="before")
     @classmethod
     def normalize_id(cls, value: Any) -> Any:
