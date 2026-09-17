@@ -75,6 +75,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--model", choices=["mistral", "qwen"])
     parser.add_argument("--limit", type=int, help="Limit cases per task for a smoke run")
     parser.add_argument(
+        "--prompt-version",
+        choices=["v2", "v3"],
+        help="Extraction only: v2 is transfer, v3 writes docs/day5-extract-v3-*.jsonl",
+    )
+    parser.add_argument(
         "--validate-only",
         action="store_true",
         help="Validate configuration and corpus without calling Ollama",
@@ -244,13 +249,22 @@ def main() -> None:
     else:
         selected_tasks = ["summarization", "extraction", "triage"]
 
+    prompt_version_override = cast(str | None, args.prompt_version)
+    if prompt_version_override == "v3" and selected_tasks != ["extraction"]:
+        raise SystemExit("--prompt-version v3 requires --task extraction")
+
     settings = Settings.from_env()
     selected_models = [cast(str, args.model)] if args.model else list(settings.models)
     docs = PROJECT_ROOT / "docs"
     docs.mkdir(parents=True, exist_ok=True)
-    usage_path = docs / "day5-usage.jsonl"
-    outputs_path = docs / "day5-run.jsonl"
-    scores_path = docs / "day5-scores.jsonl"
+    if prompt_version_override == "v3":
+        usage_path = docs / "day5-extract-v3-usage.jsonl"
+        outputs_path = docs / "day5-extract-v3-run.jsonl"
+        scores_path = docs / "day5-extract-v3-scores.jsonl"
+    else:
+        usage_path = docs / "day5-usage.jsonl"
+        outputs_path = docs / "day5-run.jsonl"
+        scores_path = docs / "day5-scores.jsonl"
     for path in (usage_path, outputs_path, scores_path):
         if path.exists():
             path.unlink()
@@ -264,6 +278,8 @@ def main() -> None:
 
     for task in selected_tasks:
         prompt_id, version, schema, max_tokens = TASKS[task]
+        if task == "extraction" and prompt_version_override is not None:
+            version = prompt_version_override
         template = load(prompt_id, version)
         pairs = load_cases(task)
         if limit is not None:
