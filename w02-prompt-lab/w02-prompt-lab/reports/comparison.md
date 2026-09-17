@@ -14,7 +14,11 @@ Prompt: `triage.v2` for both models. Qwen is transfer (prompt written against Mi
 | qwen | triage.v2 (transfer) | 12 of 12 | 9 of 12 | 8 of 12 | 0 | 4 | 12 of 12 | 0 | 7.7s | 9.3s | $0.00 |
 
 Cost per case includes transport retries and schema repair. Repair cases: mistral 1 of 12, qwen 0 of 12.
+
+Tokens (all attempts): mistral 5977 in / 2320 out (13 obs); qwen 4903 in / 2103 out (12 obs).
+
 HTTP POST median/max (all attempts): mistral 7208 / 10213 ms (13 obs); qwen 7720 / 9323 ms (12 obs).
+
 Mistral T02 failed parse after one repair (invalid `TriageOutput` JSON). Queue/escalation counts still include that case as a miss.
 
 ## Summarization
@@ -27,7 +31,11 @@ Prompt: `summarize.v1` for both. Qwen is transfer.
 | qwen | summarize.v1 (transfer) | 12 of 12 | 60 of 60 | 64 of 64 | 4 | 0 of 60 | 1 of 1 | 12.1s | 15.9s | $0.00 |
 
 Repair cases: mistral 12 of 12, qwen 0 of 12.
+
+Tokens (all attempts): mistral 23740 in / 9871 out (24 obs); qwen 11403 in / 2928 out (12 obs).
+
 Mistral failed all 12 parses: it echoed schema-shaped JSON (`document_status` as `{}`, missing field `value`/`status`) instead of `SummarizationOutput`.
+
 HTTP: mistral 15034 / 32009 ms (24 obs); qwen 12114 / 15853 ms (12 obs).
 
 ## Extraction
@@ -40,7 +48,11 @@ Prompt: `extract.v2` for both. Qwen is transfer.
 | qwen | extract.v2 (transfer) | 12 of 12 | 71 of 73 | 73 of 74 | 2 | 1 of 73 | 16 of 18 | 1 of 1 | 14.9s | 17.5s | $0.00 |
 
 Repair cases: mistral 9 of 12, qwen 0 of 12.
+
+Tokens (all attempts): mistral 27497 in / 10714 out (21 obs); qwen 18059 in / 3353 out (12 obs).
+
 Mistral parsed 3 of 12. The other 9 failed schema after repair (wrong object, extra keys, or example JSON such as `John Doe`). Failed cases score as missed evidence, not as “wrong fields on valid JSON.”
+
 HTTP: mistral 18936 / 42277 ms (21 obs); qwen 14936 / 17496 ms (12 obs).
 
 ### Extraction add-on: adapted prompt (not in the 72-eval)
@@ -51,15 +63,19 @@ Run `extract-v3-qwen`. Same 12 extraction cases, Qwen only, `extract.v3`.
 | --- | --- | --- | --- | --- | --- | --- |
 | qwen | extract.v3 (adapted) | 0 of 12 | 0 of 73 | 16.9s | 28.6s | $0.00 |
 
-Repair cases: 12 of 12. Qwen `extract.v3` failed all 12 parses: extra keys and illegal statuses copied from the dumped JSON schema. This is transfer vs adapted on Qwen, not a second 72-eval.
+Repair cases: 12 of 12. Tokens (all attempts): 16495 in / 4770 out (24 obs). Qwen `extract.v3` failed all 12 parses: extra keys and illegal statuses copied from the dumped JSON schema. This is transfer vs adapted on Qwen, not a second 72-eval.
 
 ## What this does not show
 
 The set is 12 cases per task. A one- or two-case difference is not a ranking.
+
 No percentages. No claim about production volume or document types absent from the set.
+
 Qwen rows on v1/v2 ran prompts developed against Mistral and are labeled transfer. They are evidence of transfer, not of Qwen’s ceiling on an adapted prompt — except extraction, where adapted `extract.v3` was measured and parsed 0 of 12.
+
 Latency is from this container to host Ollama on one afternoon. Median and max only; no p95.
-Provider/API cost is $0.00; token and repair load still differ by row.
+
+Provider/API cost is $0.00. Input/output tokens below each table include retries and repairs.
 
 ## Recommendation
 
